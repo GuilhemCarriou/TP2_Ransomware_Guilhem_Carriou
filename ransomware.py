@@ -36,7 +36,9 @@ class Ransomware:
 
     def get_files(self, filter:str)->list:
         # return all files matching the filter
-        raise NotImplemented()
+
+        # retourne le chemin absolu de tous les fichiers de l'extension filtre 
+        raise list((Path().absolute()).rglob(filter)) # attention retourne PosixPath['file.txt']?
 
     def encrypt(self):
         # main function for encrypting (see PDF)

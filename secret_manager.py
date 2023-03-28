@@ -28,11 +28,27 @@ class SecretManager:
         self._log = logging.getLogger(self.__class__.__name__)
 
     def do_derivation(self, salt:bytes, key:bytes)->bytes:
-        raise NotImplemented()
+
+        derivation_method=PBKDF2HMAC(
+            algorithm=hashes.SHA256(), # hashage par SHA256 (découpages, compressions du sel)
+            length=self.KEY_LENGTH,
+            salt=salt,
+            iterations=self.ITERATION
+        )
+
+        # self._token ?
+        token=derivation_method.derive(key)
+        return token # bytes
 
 
     def create(self)->Tuple[bytes, bytes, bytes]:
-        raise NotImplemented()
+
+        # self._key=os.urandom(self.KEY_LENGTH)
+        # self._salt=os.urandom(self.SALT_LENGTH)
+
+        token=self.do_derivation(self._salt,self._key)
+
+        return self._key,self._salt,token
 
 
     def bin_to_b64(self, data:bytes)->str:
