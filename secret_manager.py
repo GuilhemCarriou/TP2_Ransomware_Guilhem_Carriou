@@ -39,7 +39,6 @@ class SecretManager:
             iterations=self.ITERATION
         )
 
-        # self._token ?
         token=derivation_method.derive(key)
         return token # bytes
 
@@ -100,7 +99,16 @@ class SecretManager:
 
     def load(self)->None:
         # function to load crypto data
-        raise NotImplemented()
+        path=os.path.join(self._path_token,'salt.bin')
+        with open(path,'rb') as file:
+            salt=file.read()
+        self._salt=salt
+
+
+        path=os.path.join(self._path_token,'token.bin')
+        with open(path,'rb') as file:
+            token=file.read()
+        self._token=token
 
     def check_key(self, candidate_key:bytes)->bool:
         # Assert the key is valid
